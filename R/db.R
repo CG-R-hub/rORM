@@ -1,32 +1,40 @@
-library(dplyr)
-
-#' Title
+#' Given an existing DB Table which existing using the given DB connection
+#' (`con`) this function returns all table fields and all keys if any exist.
 #'
-#' @param con
-#' @param table_name
+#' @param con DB connection
+#' @param table_name Name of DB table
 #'
-#' @return
+#' @return list containing the `primary_keys` and `fields` of the table.
 #' @export
 #'
 #' @examples
+#' rorm_extract_pg_structure_table(con, "account")
+#'
 rorm_extract_pg_structure_table <- function(con, table_name) {
   primary_keys <- DBI::dbGetQuery(con, paste0(
-  "SELECT c.column_name, c.data_type FROM information_schema.table_constraints tc
+    "SELECT c.column_name, c.data_type FROM information_schema.table_constraints tc
                                      JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name)
                                      JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema
                                      AND tc.table_name = c.table_name AND ccu.column_name = c.column_name
-  WHERE constraint_type = 'PRIMARY KEY' and tc.table_name = '", table_name, "';"))
+   WHERE constraint_type = 'PRIMARY KEY' and tc.table_name = '", table_name, "';"
+  ))
 
-  return(list(primary_keys = primary_keys, fields = names(DBI::dbReadTable(con, table_name)[0, ])))
+  return(list(
+    primary_keys = primary_keys,
+    fields = names(DBI::dbReadTable(con, table_name)[0, ])
+  ))
 }
 
 
-#' Title
+#' DB helper function for package examples and package testing which creates
+#' a PostgreSQL DB connection to a default database. Credentials are hard coded
+#' because it is only for demo purposes. Everyone can create their own DB
+#' connection straight forward with the `DBI` package.
 #'
-#' @return
-#' @export
+#' @return DBI DB connection
 #'
 #' @examples
+#' rorm_connect_to_test_db()
 rorm_connect_to_test_db <- function() {
   return(
     DBI::dbConnect(
@@ -41,25 +49,22 @@ rorm_connect_to_test_db <- function() {
 }
 
 
-#' This script uses the example R datasets to create a Postgres Database for
-#' testing
+#' DB helper function for package examples and package testing which uses the
+#' example R datasets to create a PostgreSQL Database for testing
 #'
-#' @param con
+#' @param con DB connection
+#' @examples
+#' rorm_initialize_database_with_testdata(con)
 rorm_initialize_database_with_testdata <- function(con) {
   DBI::dbExecute(con, statement = "DROP TABLE IF EXISTS air_passengers;")
   DBI::dbExecute(con, statement = "CREATE TABLE air_passengers (year INTEGER, month TEXT, counted_people INTEGER, UNIQUE(year, month))")
   air_passengers <- data.frame(year = rep(c(1949:1960), each = 12), month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), counted_people = datasets::AirPassengers)
   DBI::dbAppendTable(con, "air_passengers", air_passengers)
 
-
   DBI::dbExecute(con, statement = "DROP TABLE IF EXISTS beaver;")
   DBI::dbCreateTable(con, "beaver", datasets::beaver1[0, ])
   DBI::dbAppendTable(con, "beaver", datasets::beaver1)
   DBI::dbAppendTable(con, "beaver", datasets::beaver2)
-
-
-
-
   DBI::dbExecute(con, statement = "DROP TABLE IF EXISTS account;")
   DBI::dbExecute(con, statement = "CREATE TABLE account (user_id SERIAL PRIMARY KEY, prename TEXT, name TEXT, email TEXT, last_login TIMESTAMP, last_password_change DATE);")
 
@@ -73,32 +78,26 @@ rorm_initialize_database_with_testdata <- function(con) {
 
   DBI::dbAppendTable(con, "account", account)
 
-
   DBI::dbExecute(con, statement = "DROP TABLE IF EXISTS chicken_weight;")
   DBI::dbExecute(con, statement = "CREATE TABLE chicken_weight (meassue_id SERIAL PRIMARY KEY, weight NUMERIC, time NUMERIC, chicken_id INTEGER, diet_id INTEGER);")
-  chicken_weight <- datasets::ChickWeight %>%
-    dplyr::rename(
-      time = Time,
-      chicken_id = "Chick",
-      diet_id = "Diet"
-    ) %>%
-    dplyr::mutate(
-      chicken_id = as.numeric(chicken_id),
-      diet_id = as.numeric(diet_id)
-    )
 
-  DBI::dbAppendTable(con, "chicken_weight", chicken_weight)
+  # process the chicken_weight data.frame to match the DB table
+  chicken_weight_new <- datasets::ChickWeight
+  chicken_weight_new$time <- chicken_weight_new$Time
+  chicken_weight_new$chicken_id <- as.numeric(chicken_weight_new$Chick)
+  chicken_weight_new$diet_id <- as.numeric(chicken_weight_new$Diet)
+  chicken_weight_new <- chicken_weight_new[, c("weight", "time", "chicken_id", "diet_id")]
+
+  DBI::dbAppendTable(con, "chicken_weight", chicken_weight_new)
 }
 
 
-#' Title
+#' DB helper function for package examples and package testing which clean up
+#' the test DB setup made with `rorm_initialize_database_with_testdata`.
 #'
-#' @param con
-#'
-#' @return
-#' @export
-#'
+#' @param con DB connection
 #' @examples
+#' rorm_cleanup_database_from_testdata(con)
 rorm_cleanup_database_from_testdata <- function(con) {
   DBI::dbExecute(con, statement = "DROP TABLE IF EXISTS air_passengers;")
   DBI::dbExecute(con, statement = "DROP TABLE IF EXISTS beaver;")

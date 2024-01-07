@@ -1,6 +1,15 @@
-RORMPostgreSQLKeySetting <- list(UNIQUE = "UNIQUE", PRIMARY = "PRIMARY", NONE = "NONE")
+#' RORM constant to define different table key settings like UNION or PRIMARY
+#' @export
+RORMPostgreSQLKeySetting <- list(UNIQUE = "UNIQUE",
+                                 PRIMARY = "PRIMARY",
+                                 NONE = "NONE")
 
-
+#' Base class to connect to a specific given (PostgreSQL) DB table to run
+#' standardized CRUD operations, like create, read, update and delete on this
+#' table.
+#' This base class is mainly the core to the RORM package and will be inherited
+#' using the code generator to configure the ORM mapper for each table.
+#' @export
 RORMPostgreSQLBaseClass <- R6::R6Class(
   classname = "RORMPostgreSQLBaseClass",
   public = list(
@@ -11,7 +20,8 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
     db_connection = NULL,
     initialize = function(conn) {
       if (any(is.null(c(self$field, self$table_name, self$key_setting)))) {
-        stop("You try to initalize a base ORM class which is not possible. Please use a derivated class for initialization.")
+        stop("You try to initalize a base ORM class which is not possible.
+             Please use a derivated class for initialization.")
       }
       self$db_connection <- conn
     },
@@ -29,7 +39,9 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
 
       private$validate_key_and_stop(key)
 
-      sql <- glue::glue_sql('DELETE FROM "', self$table_name, '"  WHERE ', private$key_sql(key), .con = self$db_connection)
+      sql <- glue::glue_sql('DELETE FROM "',
+                            self$table_name,
+                            '"  WHERE ', private$key_sql(key), .con = self$db_connection)
       if (self$verbose) {
         print(sql)
       }

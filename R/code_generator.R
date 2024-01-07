@@ -1,13 +1,17 @@
-#' Title
+#' Generate the code to map (PostgreSQL) DB tables to a RORM model.
 #'
-#' @param con
-#' @param prefix
+#' @param con DB connection
+#' @param prefix The prefix of the class and model variables, default is RORM
 #'
-#' @return
+#' @return R code in string format which can be evaluated
 #' @export
 #'
 #' @examples
-rorm_generate_code <- function(con, prefix="RORM") {
+#' rorm_generate_code(con)
+#'
+#' rorm_generate_code(con, prefix = "DB")
+rorm_generate_code <- function(con,
+                               prefix = "RORM") {
   generated_code <- ""
   for (table_name in DBI::dbListTables(con)) {
     table_details <- rorm_extract_pg_structure_table(con, table_name)
@@ -23,7 +27,7 @@ rorm_generate_code <- function(con, prefix="RORM") {
 
     # TODO in a helper function
     fields <- vector_to_R_code(table_details$fields)
-    key <-vector_to_R_code(table_details$primary_keys$column_name)
+    key <- vector_to_R_code(table_details$primary_keys$column_name)
 
     modelname <- sprintf("%s%sModel", prefix, str_camel_case(table_name))
 
@@ -44,25 +48,25 @@ rorm_generate_code <- function(con, prefix="RORM") {
 {modelname} <- {classname}$new(con)
 ")
 
-
     generated_code <- paste0(generated_code, code)
-
   }
   return(generated_code)
 }
 
 
-#' Title
+#' Generate the RORM mapper classes / models codes and write it to a file
+#' which can be included in the R project
 #'
-#' @param con
-#' @param prefix
-#' @param filepath
+#' @param con DB connection
+#' @param prefix The prefix of the class and model variables, default is RORM
+#' @param filepath Path to source code
 #'
-#' @return
+#' @value writes the R code to a file
 #' @export
 #'
 #' @examples
-rorm_generate_code_to_file <- function(con, prefix="RORM", filepath = "rorm_classes.R") {
-write(rorm_generate_code(con = con, prefix = prefix), file = filepath)
+rorm_generate_code_to_file <- function(con,
+                                       prefix = "RORM",
+                                       filepath = "rorm_models.R") {
+  write(rorm_generate_code(con = con, prefix = prefix), file = filepath)
 }
-
