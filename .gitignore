@@ -47,3 +47,11 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+
+# The folder needs not to be tracked only the lock file
+renv
+
+# This is a default output of the package calculations, better not to track it
+# by default
+rorm_models.R

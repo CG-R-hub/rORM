@@ -1,0 +1,25 @@
+Package: rORM
+Type: Package
+Title: Database Object Relational Mapper for R Language using DBI
+Version: 0.1.0
+Author: Benjamin Manns
+Maintainer: Benjamin Manns <benjamin.manns@capgemini.com>
+Description: The rORM package give you the possibility to generate R code 
+    which provides R6 objects for each DB table. This objects works as models
+    which can be used to perform basic CRUD operations on the DB.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    DBI,
+    glue,
+    logging,
+    R6,
+    RPostgres,
+    RSQLite,
+    stringi,
+    stringr
+RoxygenNote: 7.2.3
