@@ -28,13 +28,6 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
     verbose = TRUE,
     dry_run = FALSE,
     delete = function(key) {
-      print("SQL")
-      print(private$key_sql(key))
-
-
-
-
-
       key <- private$format_key_if_neccessary(key)
 
       private$validate_key_and_stop(key)

@@ -1,23 +1,35 @@
 
 
+# this will be generated with code generator
+# the idea is to have a base class which handle many situations
+# then the code generator only creates the inherit classes with hopefully only need to specifiy table names, col names and primary keys
 
+# Hello, world!
+#
+# This is an example function named 'hello'
+# which prints 'Hello, world!'.
+#
+# You can learn more about package authoring with RStudio at:
+#
+#   http://r-pkgs.had.co.nz/
+#
+# Some useful keyboard shortcuts for package authoring:
+#
+#   Install Package:           'Ctrl + Shift + B'
+#   Check Package:             'Ctrl + Shift + E'
+#   Test Package:              'Ctrl + Shift + T'
 
 #'
 #'
 #'
-#'
-#  TODO implement packageVersion('DBI')
-
-# TODO Table structe detection
-# TODO Code generator with posibiltz to set prefix
-# TODO verbose and logging
-# use glue everzwhere
+#' TODO licence in source code
+# TODO looger instead of print logging
 # TOOD has manz has One relationship
-# TODO unittest at least for my development, test also osme injections and strange code
+# TODO unittest at least for my development, test also some injections and strange code
 
-# TODO if no primary key is set then force a named key which is used as a where clause if this column exists of coursed x ``
-
-
-# TODO naming of everything
+# TODO README
+# TODO testing pipeline
+# TODO badges
+# TODO pipeline for package build
 
 

@@ -16,7 +16,7 @@ which can be used to perform basic CRUD operations on the DB.
 
 Only github installation possibly right now:
 
-`devtools::install_github("https://github.com/CG-staff/rORM")`
+`devtools::install_github("https://github.com/CG-R-hub/rORM")`
 
 ## Get Started
 
@@ -53,15 +53,19 @@ be changed.
 
 ## Model API
 
-- `RORMExampleModel$insert(df)`
+- `RORMExampleModel$insert(df)`: Method to insert new table content.
+   - `df` contains the new content of the DB table. Potential values for the key columns will be deleted if the table has a primary key and overwritten by the primary key logic of the DB.
 
-- `RORMExampleModel$update(key, df)`
+- `RORMExampleModel$update(key, df)`: Method to update existing table content
+    - `key`: The column value which content should be updated. If the table has a primary key, then only a value can be provided, otherwise a named vector is required. Does the table has no keys at all, then any named vector will be used as WHERE argument. This can lead to multiple row updates.  
+    - `df`: The new data as data.frame.
 
-- `RORMExampleModel$delete(key)`
+- `RORMExampleModel$delete(key)`: Method to delete a row by key.
+    - `key`: The key value what to delete.
 
-- `RORMExampleModel$get(key)`
+- `RORMExampleModel$get(key)`: Method to load a row by.
+    - `key`: The key value for what to filter for.
 
-- `RORMExampleModel$all()`
-
+- `RORMExampleModel$all()`: Method to load the entire table.
 
  

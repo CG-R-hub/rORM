@@ -48,6 +48,10 @@ testthat::test_that("RORMPostgreSQLBaseClass - update() method", {
   testthat::expect_equal(as.character(sql), 'UPDATE account SET "email"=\'example_email@exampledomain.com\',"prename"=\'Alan\' WHERE "user_id"=\'1\'')
 })
 
+testthat::test_that("RORMPostgreSQLBaseClass - delete() method", {
+  sql <- RORMAccountModel$delete(1)
+  testthat::expect_equal(as.character(sql), 'DELETE FROM "account"  WHERE "user_id" = \'1\'')
+})
 
 
 testthat::test_that("RORMPostgreSQLKeySetting", {
