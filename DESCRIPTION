@@ -15,8 +15,11 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     DBI,
+    glue,
     logging,
     R6,
     RPostgres,
+    RSQLite,
     stringi,
     stringr
+RoxygenNote: 7.2.3

@@ -23,6 +23,10 @@
 #'
 #' @param con DB connection
 #' @param prefix The prefix of the class and model variables, default is RORM
+#' @param verbose Whether the model runs in verbose mode and log all
+#'                sql statements
+#' @param db_connection_name The name of the DBI connection variable used to
+#'        connect to the DB
 #'
 #' @return R code in string format which can be evaluated
 #' @export
@@ -32,10 +36,12 @@
 #'
 #' rorm_generate_code(con, prefix = "DB")
 rorm_generate_code <- function(con,
-                               prefix = "RORM") {
+                               prefix = "RORM",
+                               verbose = FALSE,
+                               db_connection_name = "con") {
   generated_code <- ""
   for (table_name in DBI::dbListTables(con)) {
-    table_details <- rorm_extract_pg_structure_table(con, table_name)
+    table_details <- rorm_extract_db_structure_table(con, table_name)
     classname <- sprintf("%s%sClass", prefix, str_camel_case(table_name))
 
     if (nrow(table_details$primary_keys) == 1) {
@@ -46,7 +52,6 @@ rorm_generate_code <- function(con,
       key_setting <- RORMPostgreSQLKeySetting$NONE
     }
 
-    # TODO in a helper function
     fields <- vector_to_R_code(table_details$fields)
     key <- vector_to_R_code(table_details$primary_keys$column_name)
 
@@ -62,11 +67,12 @@ rorm_generate_code <- function(con,
     fields = ", fields, ",
     key = ", key, ",
     table_name = '{table_name}',
-    key_setting = '{key_setting}'
+    key_setting = '{key_setting}',
+    verbose = {verbose}
   )
 )
 
-{modelname} <- {classname}$new(con)
+{modelname} <- {classname}$new({db_connection_name})
 ")
 
     generated_code <- paste0(generated_code, code)
@@ -81,13 +87,27 @@ rorm_generate_code <- function(con,
 #' @param con DB connection
 #' @param prefix The prefix of the class and model variables, default is RORM
 #' @param filepath Path to source code
-#'
-#' @value writes the R code to a file
+#' @param verbose Whether the model runs in verbose mode and log all
+#'                sql statements
+#' @param db_connection_name The name of the DBI connection variable used to
+#'        connect to the DB
+#' @return writes the R code to a file
 #' @export
 #'
 #' @examples
+#' rorm_generate_code_to_file(con)
 rorm_generate_code_to_file <- function(con,
                                        prefix = "RORM",
+                                       verbose = FALSE,
+                                       db_connection_name = "con",
                                        filepath = "rorm_models.R") {
-  write(rorm_generate_code(con = con, prefix = prefix), file = filepath)
+  write(
+    rorm_generate_code(
+      con = con,
+      prefix = prefix,
+      verbose = verbose,
+      db_connection_name = db_connection_name
+    ),
+    file = filepath
+  )
 }

@@ -69,3 +69,8 @@ be changed.
 - `RORMExampleModel$all()`: Method to load the entire table.
 
  
+## Development
+
+### Steps todo before merging
+
+1. Run inside R Console: `devtools::document()`.

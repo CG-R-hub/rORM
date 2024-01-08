@@ -38,7 +38,7 @@
 #' # has no spaces.
 #' str_camel_case("table name with spaces")
 str_camel_case <- function(string) {
-  parts <- unlist(stringi::stri_split(string, regex =  "_|\\-|\\ "))
+  parts <- unlist(stringi::stri_split(string, regex = "_|\\-|\\ "))
 
   string <- stringi::stri_trans_tolower(parts)
   first_char <- stringi::stri_trans_toupper(substr(string, 1, 1))
@@ -58,16 +58,16 @@ str_camel_case <- function(string) {
 #' @examples
 #' vector_to_R_code(1:10)
 #' vector_to_R_code("Hello World")
-#' vector_to_R_code(c(1,2,4,5,"6"))
-#' eval(parse(text=paste0(vector_to_R_code(1:10), " + 11")))
+#' vector_to_R_code(c(1, 2, 4, 5, "6"))
+#' eval(parse(text = paste0(vector_to_R_code(1:10), " + 11")))
 vector_to_R_code <- function(vector) {
   if (is.numeric(vector)) {
-    return (
-      paste0('c(',paste(vector, collapse = ', '), ')')
+    return(
+      paste0("c(", paste(vector, collapse = ", "), ")")
     )
   }
 
   return(
-    paste0('c("',paste(stringr::str_replace_all(string = vector, pattern = '"', replacement = '\\\\\"'), collapse = '", "'), '")')
+    paste0('c("', paste(stringr::str_replace_all(string = vector, pattern = '"', replacement = '\\\\\"'), collapse = '", "'), '")')
   )
 }

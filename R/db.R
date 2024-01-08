@@ -19,19 +19,19 @@
 # SOFTWARE.
 
 
-#' Given an existing DB Table which existing using the given DB connection
-#' (`con`) this function returns all table fields and all keys if any exist.
+#' Given an existing DB Table which existing using the given PostgreSQL DB
+#' connection (`con`) this function returns all table fields and all keys
+#' if any exist.
 #'
 #' @param con DB connection
 #' @param table_name Name of DB table
 #'
 #' @return list containing the `primary_keys` and `fields` of the table.
-#' @export
 #'
 #' @examples
-#' rorm_extract_pg_structure_table(con, "account")
+#' rorm_extract_postgresql_structure_table(con, "account")
 #'
-rorm_extract_pg_structure_table <- function(con, table_name) {
+rorm_extract_postgresql_structure_table <- function(con, table_name) {
   primary_keys <- DBI::dbGetQuery(con, paste0(
     "SELECT c.column_name, c.data_type FROM information_schema.table_constraints tc
                                      JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name)
@@ -46,17 +46,80 @@ rorm_extract_pg_structure_table <- function(con, table_name) {
   ))
 }
 
+#' Given an existing DB Table which existing using the given SQLite DB
+#' connection (`con`) this function returns all table fields and all keys
+#' if any exist.
+#'
+#' @param con DB connection
+#' @param table_name Name of DB table
+#'
+#' @return list containing the `primary_keys` and `fields` of the table.
+#'
+#' @examples
+#' rorm_extract_sqlite_structure_table(con, "account")
+#'
+rorm_extract_sqlite_structure_table <- function(con, table_name) {
+  meta_info <- DBI::dbGetQuery(con, glue::glue_sql("
+  SELECT m.name as table_name,
+    p.name as column_name,
+    p.type as data_type,
+    \"p.notnull\" as is_not_null,
+    p.pk
+  FROM sqlite_master AS m JOIN
+       pragma_table_info(m.name) AS p WHERE
+    m.type = 'table' AND
+    table_name = {table_name}
+  ORDER BY m.name, p.cid", .con = con))
+
+  primary_keys <- meta_info[meta_info$pk > 0, c("column_name", "data_type")]
+
+  return(list(
+    primary_keys = primary_keys,
+    fields = meta_info$column_name
+  ))
+}
+
+#' Given an existing DB Table which existing using the given DB connection
+#' (`con`) this function returns all table fields and all keys if any exist.
+#'
+#' @param con DB connection
+#' @param table_name Name of DB table
+#'
+#' @return list containing the `primary_keys` and `fields` of the table.
+#' @export
+#'
+#' @examples
+#' rorm_extract_db_structure_table(con, "account")
+#'
+rorm_extract_db_structure_table <- function(con, table_name) {
+  if (class(con) == "SQLiteConnection") {
+    return(rorm_extract_sqlite_structure_table(con, table_name))
+  } else if (class(con) == "PqConnection") {
+    return(rorm_extract_postgresql_structure_table(con, table_name))
+  } else {
+    stop(sprintf("The used DBI Driver: '%s' is unfortunately not supported at the moment", class(con)))
+  }
+}
 
 #' DB helper function for package examples and package testing which creates
 #' a PostgreSQL DB connection to a default database. Credentials are hard coded
 #' because it is only for demo purposes. Everyone can create their own DB
 #' connection straight forward with the `DBI` package.
 #'
+#' @param type which type of driver should be used; one of
+#'             ("sqlite", "postgresql").
 #' @return DBI DB connection
 #'
 #' @examples
 #' rorm_connect_to_test_db()
-rorm_connect_to_test_db <- function() {
+rorm_connect_to_test_db <- function(type = c("sqlite", "postgresql")[1]) {
+  if (type == "sqlite") {
+    return(
+      DBI::dbConnect(RSQLite::SQLite(), "")
+    )
+  }
+
+
   return(
     DBI::dbConnect(
       RPostgres::Postgres(),
@@ -68,6 +131,8 @@ rorm_connect_to_test_db <- function() {
     )
   )
 }
+
+
 
 
 #' DB helper function for package examples and package testing which uses the

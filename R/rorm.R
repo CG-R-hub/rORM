@@ -26,9 +26,11 @@ rorm_logger <- logging::getLogger("rORM")
 
 #' RORM constant to define different table key settings like UNION or PRIMARY
 #' @export
-RORMPostgreSQLKeySetting <- list(UNIQUE = "UNIQUE",
-                                 PRIMARY = "PRIMARY",
-                                 NONE = "NONE")
+RORMPostgreSQLKeySetting <- list(
+  UNIQUE = "UNIQUE",
+  PRIMARY = "PRIMARY",
+  NONE = "NONE"
+)
 
 #' Base class to connect to a specific given (PostgreSQL) DB table to run
 #' standardized CRUD operations, like create, read, update and delete on this
@@ -39,28 +41,47 @@ RORMPostgreSQLKeySetting <- list(UNIQUE = "UNIQUE",
 RORMPostgreSQLBaseClass <- R6::R6Class(
   classname = "RORMPostgreSQLBaseClass",
   public = list(
+    #' @field fields fields of the connected table.
     fields = NULL,
+    #' @field key if exists, the keys of the table, could be more if a union is in place.
     key = NULL,
+    #' @field table_name The name of the table.
     table_name = NULL,
+    #' @field key_setting The type of keys used (PRIMARY, UNION, ...)
     key_setting = NULL,
+    #' @field db_connection DBI DB connection.
     db_connection = NULL,
-    initialize = function(conn) {
+    #' Initialize the Class (new method) and connect the ORM model to the DB
+    #'
+    #' @param con The DB connection
+    #'
+    #' @return ORM model object
+    initialize = function(con) {
       if (any(is.null(c(self$field, self$table_name, self$key_setting)))) {
         stop("You try to initalize a base ORM class which is not possible.
              Please use a derivated class for initialization.")
       }
-      self$db_connection <- conn
+      self$db_connection <- con
     },
-    verbose = TRUE,
+    #' @field verbose for logging switch verbose to TRUE.
+    verbose = FALSE,
+    #' @field dry_run for not doing any DB operations switch dry_run to TRUE.
     dry_run = FALSE,
+    #' Delete a DB entry by key
+    #'
+    #' @param key The key value what to delete.
+    #'
+    #' @return Number of entries deleted
     delete = function(key) {
       key <- private$format_key_if_neccessary(key)
 
       private$validate_key_and_stop(key)
 
       sql <- glue::glue_sql('DELETE FROM "',
-                            self$table_name,
-                            '"  WHERE ', private$key_sql(key), .con = self$db_connection)
+        self$table_name,
+        '"  WHERE ', private$key_sql(key),
+        .con = self$db_connection
+      )
       if (self$verbose) {
         rorm_logger$info(sql)
       }
@@ -69,8 +90,12 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
       } else {
         return(DBI::dbExecute(self$db_connection, sql))
       }
-
     },
+    #' Method to load a row by key.
+    #'
+    #' @param key The key value for what to filter for.
+    #'
+    #' @return The row which match the key.
     get = function(key) {
       key <- private$format_key_if_neccessary(key)
       private$validate_key_and_stop(key)
@@ -85,6 +110,9 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
         return(DBI::dbGetQuery(self$db_connection, sql))
       }
     },
+    #' Method to load the entire table.
+    #'
+    #' @return Entire table
     all = function() {
       sql <- glue::glue_sql('SELECT * from "', self$table_name, '"', .con = self$db_connection)
       if (self$verbose) {
@@ -97,6 +125,11 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
         return(DBI::dbGetQuery(self$db_connection, sql))
       }
     },
+    #' Method to insert new table content.
+    #'
+    #' @param df contains the new content of the DB table. Potential values for the key columns will be deleted if the table has a primary key and overwritten by the primary key logic of the DB.
+    #'
+    #' @return Number of entries inserted.
     insert = function(df) {
       col_names <- names(df)
       required_fields <- self$fields
@@ -120,8 +153,16 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
       } else {
         return(DBI::dbAppendTable(self$db_connection, self$table_name, df))
       }
-
     },
+    #' Method to update existing table content.
+    #'
+    #' @param key The column value which content should be updated. If the table
+    #'            has a primary key, then only a value can be provided, otherwise
+    #'            a named vector is required. Does the table has no keys at all,
+    #'            then any named vector will be used as WHERE argument.
+    #'            This can lead to multiple row updates.
+    #' @param df The new data as data.frame.
+    #' @return Number of entries updated.
     update = function(key, df) {
       key <- private$format_key_if_neccessary(key)
       private$validate_key_and_stop(key)
@@ -175,7 +216,7 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
       msg <- sprintf("You specified a key which is invalid. For the table '%s' these are the primariy / unique keys: (%s)", self$table_name, self$key)
 
       if (self$key_setting == RORMPostgreSQLKeySetting$NONE ||
-          self$key_setting == RORMPostgreSQLKeySetting$UNIQUE) {
+        self$key_setting == RORMPostgreSQLKeySetting$UNIQUE) {
         # We need a named key otherwise we can not work
         if (!private$is_named(key)) {
           stop(msg)
@@ -208,4 +249,3 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
     }
   )
 )
-

@@ -1,11 +1,11 @@
 RORMAccountClass <- R6::R6Class(
-  classname = 'RORMAccountClass',
+  classname = "RORMAccountClass",
   inherit = RORMPostgreSQLBaseClass,
   public = list(
     fields = c("user_id", "prename", "name", "email", "last_login", "last_password_change"),
     key = c("user_id"),
-    table_name = 'account',
-    key_setting = 'PRIMARY'
+    table_name = "account",
+    key_setting = "PRIMARY"
   )
 )
 
@@ -31,7 +31,7 @@ testthat::test_that("RORMPostgreSQLBaseClass - insert() method", {
 
   # missing fields will be filled up with NA which is NULL in the DB table
   expected_df <- data.frame(
-    user_id  = NA,
+    user_id = NA,
     prename = NA,
     name = NA,
     email = "example_email@exampledomain.com",
@@ -44,7 +44,7 @@ testthat::test_that("RORMPostgreSQLBaseClass - insert() method", {
 
 
 testthat::test_that("RORMPostgreSQLBaseClass - update() method", {
-  sql <- RORMAccountModel$update(1, data.frame(email = "example_email@exampledomain.com", prename="Alan"))
+  sql <- RORMAccountModel$update(1, data.frame(email = "example_email@exampledomain.com", prename = "Alan"))
   testthat::expect_equal(as.character(sql), 'UPDATE account SET "email"=\'example_email@exampledomain.com\',"prename"=\'Alan\' WHERE "user_id"=\'1\'')
 })
 
@@ -56,7 +56,7 @@ testthat::test_that("RORMPostgreSQLBaseClass - delete() method", {
 
 testthat::test_that("RORMPostgreSQLKeySetting", {
   testthat::expect_equal(RORMPostgreSQLKeySetting$UNIQUE, "UNIQUE")
-  testthat::expect_equal(RORMPostgreSQLKeySetting$PRIMARY , "PRIMARY")
+  testthat::expect_equal(RORMPostgreSQLKeySetting$PRIMARY, "PRIMARY")
   testthat::expect_equal(RORMPostgreSQLKeySetting$NONE, "NONE")
 })
 
