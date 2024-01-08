@@ -1,3 +1,8 @@
+logging::basicConfig()
+#' The package internal logger
+#' @export
+rorm_logger <- logging::getLogger("rORM")
+
 #' RORM constant to define different table key settings like UNION or PRIMARY
 #' @export
 RORMPostgreSQLKeySetting <- list(UNIQUE = "UNIQUE",
@@ -36,7 +41,7 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
                             self$table_name,
                             '"  WHERE ', private$key_sql(key), .con = self$db_connection)
       if (self$verbose) {
-        print(sql)
+        rorm_logger$info(sql)
       }
       if (self$dry_run) {
         return(sql)
@@ -51,7 +56,7 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
 
       sql <- glue::glue_sql('SELECT * from "', self$table_name, '" WHERE ', private$key_sql(key), .con = self$db_connection)
       if (self$verbose) {
-        print(sql)
+        rorm_logger$info(sql)
       }
       if (self$dry_run) {
         return(sql)
@@ -62,7 +67,7 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
     all = function() {
       sql <- glue::glue_sql('SELECT * from "', self$table_name, '"', .con = self$db_connection)
       if (self$verbose) {
-        print(sql)
+        rorm_logger$info(sql)
       }
 
       if (self$dry_run) {
@@ -85,7 +90,7 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
       }
       df <- df[required_fields]
       if (self$verbose) {
-        print(df)
+        rorm_logger$info(df)
       }
 
 
@@ -101,8 +106,8 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
       private$validate_key_and_stop(key)
 
       if (self$verbose) {
-        print(self$fields)
-        print(key)
+        rorm_logger$info(self$fields)
+        rorm_logger$info(key)
       }
 
 
@@ -127,7 +132,7 @@ RORMPostgreSQLBaseClass <- R6::R6Class(
       )
 
       if (self$verbose) {
-        print(sql)
+        rorm_logger$info(sql)
       }
 
 
