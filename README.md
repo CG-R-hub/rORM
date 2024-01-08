@@ -76,6 +76,12 @@ be changed.
 Run these commands inside the R Console:
 
 1. `file.remove("rorm_models.R")`.
-1. `devtools::document()`.
-1. `devtools::check(document = FALSE)`.
-1. `devtools::test()`.
+1. `devtools::load_all()`
+1. `devtools::document()`
+1. `devtools::test()`
+1. `devtools::check()`
+
+If everything looks good, then do a version increase with: `usethis::use_version()`.
+
+ 
+
