@@ -10,7 +10,7 @@ The idea is simple: The `rORM` package give you the possibility to generate R
 code which provides `R6` objects for each DB table. This objects works as models
 which can be used to perform basic CRUD operations on the DB. 
 
-
+![build workflow](https://github.com/CG-R-hub/rORM/actions/workflows/R-CMD-check.yaml/badge.svg)
 
 ## Installation
 
