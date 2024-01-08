@@ -32,6 +32,7 @@
 #' @export
 #'
 #' @examples
+#' con <- rorm_connect_to_test_db(type = "sqlite")
 #' rorm_generate_code(con)
 #'
 #' rorm_generate_code(con, prefix = "DB")
@@ -95,7 +96,9 @@ rorm_generate_code <- function(con,
 #' @export
 #'
 #' @examples
-#' rorm_generate_code_to_file(con)
+#' con <- rorm_connect_to_test_db(type = "sqlite")
+#' rorm_generate_code_to_file(con, filepath = "some_file_with_R_code.R")
+#' file.remove("some_file_with_R_code.R")
 rorm_generate_code_to_file <- function(con,
                                        prefix = "RORM",
                                        verbose = FALSE,

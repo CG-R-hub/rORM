@@ -4,8 +4,8 @@
 \name{rORM-package}
 \alias{rORM}
 \alias{rORM-package}
-\title{rORM: (PostgreSQL) Database Object Relational Mapper for R Language using `DBI` package as base.}
+\title{rORM: Database Object Relational Mapper for R Language using DBI}
 \description{
-The idea is simple: The `rORM` package give you the possibility to generate R code which provides `R6` objects for each DB table. This objects works as models which can be used to perform basic CRUD operations on the DB.
+The rORM package give you the possibility to generate R code which provides R6 objects for each DB table. This objects works as models which can be used to perform basic CRUD operations on the DB.
 }
 \keyword{internal}

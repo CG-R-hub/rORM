@@ -20,6 +20,7 @@ Given an existing DB Table which existing using the given DB connection
 (`con`) this function returns all table fields and all keys if any exist.
 }
 \examples{
+con <- rorm_connect_to_test_db(type = "sqlite")
 rorm_extract_db_structure_table(con, "account")
 
 }

@@ -29,6 +29,7 @@ R code in string format which can be evaluated
 Generate the code to map (PostgreSQL) DB tables to a RORM model.
 }
 \examples{
+con <- rorm_connect_to_test_db(type = "sqlite")
 rorm_generate_code(con)
 
 rorm_generate_code(con, prefix = "DB")

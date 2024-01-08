@@ -34,5 +34,7 @@ Generate the RORM mapper classes / models codes and write it to a file
 which can be included in the R project
 }
 \examples{
-rorm_generate_code_to_file(con)
+con <- rorm_connect_to_test_db(type = "sqlite")
+rorm_generate_code_to_file(con, filepath = "some_file_with_R_code.R")
+file.remove("some_file_with_R_code.R")
 }

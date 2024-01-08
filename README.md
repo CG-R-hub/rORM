@@ -73,4 +73,9 @@ be changed.
 
 ### Steps todo before merging
 
-1. Run inside R Console: `devtools::document()`.
+Run these commands inside the R Console:
+
+1. `file.remove("rorm_models.R")`.
+1. `devtools::document()`.
+1. `devtools::check(document = FALSE)`.
+1. `devtools::test()`.

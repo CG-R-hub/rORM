@@ -21,7 +21,3 @@ Given an existing DB Table which existing using the given SQLite DB
 connection (`con`) this function returns all table fields and all keys
 if any exist.
 }
-\examples{
-rorm_extract_sqlite_structure_table(con, "account")
-
-}

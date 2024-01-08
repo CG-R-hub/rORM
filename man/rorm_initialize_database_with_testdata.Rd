@@ -15,5 +15,6 @@ DB helper function for package examples and package testing which uses the
 example R datasets to create a PostgreSQL Database for testing
 }
 \examples{
+con <- rorm_connect_to_test_db(type = "sqlite")
 rorm_initialize_database_with_testdata(con)
 }

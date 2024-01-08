@@ -27,10 +27,6 @@
 #' @param table_name Name of DB table
 #'
 #' @return list containing the `primary_keys` and `fields` of the table.
-#'
-#' @examples
-#' rorm_extract_postgresql_structure_table(con, "account")
-#'
 rorm_extract_postgresql_structure_table <- function(con, table_name) {
   primary_keys <- DBI::dbGetQuery(con, paste0(
     "SELECT c.column_name, c.data_type FROM information_schema.table_constraints tc
@@ -54,9 +50,6 @@ rorm_extract_postgresql_structure_table <- function(con, table_name) {
 #' @param table_name Name of DB table
 #'
 #' @return list containing the `primary_keys` and `fields` of the table.
-#'
-#' @examples
-#' rorm_extract_sqlite_structure_table(con, "account")
 #'
 rorm_extract_sqlite_structure_table <- function(con, table_name) {
   meta_info <- DBI::dbGetQuery(con, glue::glue_sql("
@@ -89,12 +82,14 @@ rorm_extract_sqlite_structure_table <- function(con, table_name) {
 #' @export
 #'
 #' @examples
+#' con <- rorm_connect_to_test_db(type = "sqlite")
 #' rorm_extract_db_structure_table(con, "account")
 #'
 rorm_extract_db_structure_table <- function(con, table_name) {
-  if (class(con) == "SQLiteConnection") {
+  connection_class <- as.character(class(con))
+  if (connection_class == "SQLiteConnection") {
     return(rorm_extract_sqlite_structure_table(con, table_name))
-  } else if (class(con) == "PqConnection") {
+  } else if (connection_class == "PqConnection") {
     return(rorm_extract_postgresql_structure_table(con, table_name))
   } else {
     stop(sprintf("The used DBI Driver: '%s' is unfortunately not supported at the moment", class(con)))
@@ -109,9 +104,10 @@ rorm_extract_db_structure_table <- function(con, table_name) {
 #' @param type which type of driver should be used; one of
 #'             ("sqlite", "postgresql").
 #' @return DBI DB connection
+#' @export
 #'
 #' @examples
-#' rorm_connect_to_test_db()
+#' rorm_connect_to_test_db(type = "sqlite")
 rorm_connect_to_test_db <- function(type = c("sqlite", "postgresql")[1]) {
   if (type == "sqlite") {
     return(
@@ -139,7 +135,10 @@ rorm_connect_to_test_db <- function(type = c("sqlite", "postgresql")[1]) {
 #' example R datasets to create a PostgreSQL Database for testing
 #'
 #' @param con DB connection
+#' @export
+#'
 #' @examples
+#' con <- rorm_connect_to_test_db(type = "sqlite")
 #' rorm_initialize_database_with_testdata(con)
 rorm_initialize_database_with_testdata <- function(con) {
   DBI::dbExecute(con, statement = "DROP TABLE IF EXISTS air_passengers;")
@@ -182,7 +181,10 @@ rorm_initialize_database_with_testdata <- function(con) {
 #' the test DB setup made with `rorm_initialize_database_with_testdata`.
 #'
 #' @param con DB connection
+#' @export
+#'
 #' @examples
+#' con <- rorm_connect_to_test_db(type = "sqlite")
 #' rorm_cleanup_database_from_testdata(con)
 rorm_cleanup_database_from_testdata <- function(con) {
   DBI::dbExecute(con, statement = "DROP TABLE IF EXISTS air_passengers;")

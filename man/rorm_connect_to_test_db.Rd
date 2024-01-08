@@ -23,5 +23,5 @@ because it is only for demo purposes. Everyone can create their own DB
 connection straight forward with the `DBI` package.
 }
 \examples{
-rorm_connect_to_test_db()
+rorm_connect_to_test_db(type = "sqlite")
 }

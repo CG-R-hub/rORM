@@ -15,5 +15,6 @@ DB helper function for package examples and package testing which clean up
 the test DB setup made with `rorm_initialize_database_with_testdata`.
 }
 \examples{
+con <- rorm_connect_to_test_db(type = "sqlite")
 rorm_cleanup_database_from_testdata(con)
 }
