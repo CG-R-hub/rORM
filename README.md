@@ -1,9 +1,9 @@
 # rORM (for PostgreSQL + SQLite)
 
-PostgreSQL ORM (Object Relational Mapper) for R Language using `DBI` package as
+SQL databases ORM (Object Relational Mapper) for R Language using `DBI` package as
 base.
 
-Currently, there is only PostgreSQL supported. If you require more drivers, let
+Currently, there is only PostgreSQL and SQLite supported. If you require more drivers, let
 me know.
 
 The idea is simple: The `rORM` package give you the possibility to generate R 
@@ -14,7 +14,7 @@ which can be used to perform basic CRUD operations on the DB.
 
 ## Installation
 
-Only github installation possibly right now:
+Currently only github installation possible:
 
 `devtools::install_github("https://github.com/CG-R-hub/rORM")`
 
@@ -37,17 +37,18 @@ con <- DBI::dbConnect(
 This creates a file called `rorm_models.R`. The file name and path can be
 changed using the parameter `filepath`.
 3. Load the new models to the environment using `source("rorm_models.R")`.
-4. Now the mapper models can be used for example image we have a table called
+4. Now the mapper models can be used. Let's say we have a table called
 `account`, then the model object called: `RORMAccountModel`. Then we can load
-all entries with: `RORMAccountModel$all()` or `RORMAccountModel$insert(data.frame(field_a = 1, field_b = "2")).`
+all entries with: `RORMAccountModel$all()` or we can insert a new entry by
+`RORMAccountModel$insert(data.frame(field_a = 1, field_b = "2")).`
 
 
 ## Code Generator Options
 
-Using the code generator there are two optional options
+Using the code generator there are two optional options:
 `rorm_generate_code_to_file(con = con, prefix = prefix, filepath = filepath)`.
-One is the `prefix` where the name of the models can be changed. 
-The second is the `filepath` where the path to the generated source code can
+- One is the `prefix` where the name of the models can be changed. 
+- The second is the `filepath` where the path to the generated source code can
 be changed.
 
 
